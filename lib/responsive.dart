@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Responsive {
+  static const smallerSize = 600;
   static const smallSize = 800;
   static const largeSize = 980;
   static const extraLargeSize = 1200;
@@ -17,7 +18,11 @@ class Responsive {
 
 //Small screen is any screen whose width is less than 800 pixels
   static bool isSmallScreen(BuildContext context) {
-    return MediaQuery.of(context).size.width < smallSize;
+    return MediaQuery.of(context).size.width < smallSize &&MediaQuery.of(context).size.width >smallerSize;
+  }
+
+  static bool isSmallerScreen(BuildContext context) {
+    return MediaQuery.of(context).size.width < smallerSize;
   }
 
 //Medium screen is any screen whose width is less than 1200 pixels,

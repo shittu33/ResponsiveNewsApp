@@ -42,7 +42,7 @@ class TabWidget extends StatelessWidget {
       @required this.tabsList,
       this.unselectedColor,
       this.selectedColor,
-      this.initial=0,
+      this.initial = 0,
       this.ontap})
       : super(key: key);
 
@@ -109,23 +109,24 @@ class MyCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const MyCustomAppBar({
     Key key,
-    @required this.height,
-    @required this.leading,
-    @required this.child,
-    @required this.trailing,
+    this.height,
+    this.leading,
+    this.child,
+    this.trailing,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     const CenterGap = 20.0;
-    return Column(
-      children: [
-        Material(
-          elevation: 2,
-          color: Colors.white,
-          child: Padding(
-            padding: EdgeInsets.all(0),
-            child: Flex(direction:Axis.horizontal,children: [
+    return Column(children: [
+      Material(
+        elevation: 2,
+        color: Colors.white,
+        child: Padding(
+          padding: EdgeInsets.all(0),
+          child: Flex(
+            direction: Axis.horizontal,
+            children: [
               leading,
               SizedBox(
                 width: CenterGap,
@@ -135,11 +136,11 @@ class MyCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 width: CenterGap,
               ),
               trailing,
-            ]),
+            ]..removeWhere((element) => element == null),
           ),
         ),
-      ],
-    );
+      ),
+    ]);
   }
 
   @override

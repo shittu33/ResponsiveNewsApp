@@ -17,11 +17,6 @@ abstract class NewsClient {
   @GET("/top-headlines?country={country}&apiKey=$NEWS_API_KEY")
   Future<NewsApiResult> getNewsByCountry(@Path("country") String countryId);
 
-  @GET(
-      "/top-headlines?country={country}&category={category}&apiKey=$NEWS_API_KEY")
-  Future<NewsApiResult> getNewsByContCat(
-      @Path("country") String countryId, @Path("category") String categoryId);
-
   @GET("/sources?apiKey=$NEWS_API_KEY") /*bbc-news*/
   Future<SourcesResult> getNewsSources();
 
@@ -32,8 +27,13 @@ abstract class NewsClient {
   Future<NewsApiResult> getNewsByCategory(@Path("category") String categoryId);
 
   @GET(
+      "/top-headlines?country={country}&category={category}&apiKey=$NEWS_API_KEY")
+  Future<NewsApiResult> getNewsByContCat(
+      @Path("country") String countryId, @Path("category") String categoryId);
+
+  @GET(
       "/top-headlines?category={category}&pageSize=2&apiKey=$NEWS_API_KEY") /*business*/
-  Future<NewsApiResult> getNewsByCategoryLimited(
+  Future<NewsApiResult> getNewsByCategoryLimit(
       @Path("category") String categoryId);
 
   @GET("/everything?q={q}&apiKey=$NEWS_API_KEY") /*bbc-news*/
@@ -75,9 +75,9 @@ class NewsDao {
     else if (cat == null && country != null)
       return client.getNewsByCountry(country).then((value) => value.articles);
     else if (cat != null && country == null)
-      return client.getNewsByCategory(country).then((value) => value.articles);
+      return client.getNewsByCategory(cat).then((value) => value.articles);
     else
-      return null;
+      return client.getNews().then((value) => value.articles);
   }
 
   Future<List<Article>> getEveryNews(String searchedWord,
@@ -94,11 +94,17 @@ class NewsDao {
       return client
           .getEveryNewsBySources(searchedWord, getSourcesComa(sources))
           .then((value) => value.articles);
+    else if (sources == null && lang == null)
+      return client
+          .getEveryNews(
+            searchedWord,
+          )
+          .then((value) => value.articles);
     else
       return null;
   }
 
-  Future<List<Article>> getTopNewsBySource(List<String> sources) {
+  Future<List<Article>> getTopNewsBySources(List<String> sources) {
     String sourcesComa = getSourcesComa(sources);
     return client
         .getTopNewsBySources(sourcesComa)
@@ -111,7 +117,7 @@ class NewsDao {
 
   Future<List<Article>> getNewsByCategoryLimited(String categoryId) {
     return client
-        .getNewsByCategoryLimited(categoryId)
+        .getNewsByCategoryLimit(categoryId)
         .then((value) => value.articles);
   }
 
@@ -132,15 +138,15 @@ class NewsDao {
   List<Tag> getTags() => [
         Tag("Covid"),
         Tag("Trump"),
-        Tag("Covid"),
-        Tag("Trump"),
-        Tag("Covid"),
-        Tag("Trump"),
-        Tag("Covid"),
-        Tag("Trump"),
-        Tag("Covid"),
-        Tag("Trump"),
-        Tag("Covid"),
+        Tag("Apple"),
+        Tag("Android"),
+        Tag("Windows"),
+        Tag("Cancer"),
+        Tag("Kanye-West"),
+        Tag("Terrorist"),
+        Tag("Insurgence"),
+        Tag("Education"),
+        Tag("School"),
       ];
 }
 
@@ -197,6 +203,12 @@ class Source {
   factory Source.fromJson(Map<String, dynamic> json) => _$SourceFromJson(json);
 
   Map<String, dynamic> toJson() => _$SourceToJson(this);
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return name;
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -215,9 +227,10 @@ class SourcesResult {
 class Country {
   String id;
   String name;
-  bool selected = false;
+  bool selected;
 
-  Country({this.id, String name, this.selected}) {
+  Country({this.id, String name, String selected}) {
+    this.selected = selected == null ? false : selected;
     this.name =
         name == null ? CountryCode.parse(id.toUpperCase()).alpha3 : name;
   }
@@ -232,59 +245,59 @@ class Tag {
 }
 
 List<Country> get countries => [
-      Country(id: "ae"),
-      Country(id: "ar"),
-      Country(id: "at"),
+//      Country(id: "ae"),
+//      Country(id: "ar"),
+//      Country(id: "at"),
       Country(id: "au"),
-      Country(id: "be"),
-      Country(id: "bg"),
-      Country(id: "br"),
-      Country(id: "ca"),
+//      Country(id: "be"),
+//      Country(id: "bg"),
+//      Country(id: "br"),
+//      Country(id: "ca"),
       Country(id: "ch"),
-      Country(id: "cn"),
-      Country(id: "co"),
-      Country(id: "cu"),
-      Country(id: "cz"),
-      Country(id: "de"),
-      Country(id: "eg"),
+//      Country(id: "cn"),
+//      Country(id: "co"),
+//      Country(id: "cu"),
+//      Country(id: "cz"),
+//      Country(id: "de"),
+//      Country(id: "eg"),
       Country(id: "fr"),
-      Country(id: "gb"),
+//      Country(id: "gb"),
       Country(id: "gr"),
-      Country(id: "hk"),
+//      Country(id: "hk"),
       Country(id: "sa"),
       Country(id: "hu"),
       Country(id: "id"),
       Country(id: "ie"),
-      Country(id: "il"),
-      Country(id: "in"),
-      Country(id: "it"),
-      Country(id: "jp"),
-      Country(id: "kr"),
-      Country(id: "lt"),
-      Country(id: "lv"),
-      Country(id: "ma"),
-      Country(id: "mx"),
+//      Country(id: "il"),
+//      Country(id: "in"),
+//      Country(id: "it"),
+//      Country(id: "jp"),
+//      Country(id: "kr"),
+//      Country(id: "lt"),
+//      Country(id: "lv"),
+//      Country(id: "ma"),
+//      Country(id: "mx"),
       Country(id: "my"),
       Country(id: "ng"),
-      Country(id: "nl"),
-      Country(id: "no"),
-      Country(id: "nz"),
-      Country(id: "ph"),
-      Country(id: "pl"),
-      Country(id: "pt"),
-      Country(id: "ro"),
-      Country(id: "rs"),
-      Country(id: "ru"),
-      Country(id: "sa"),
-      Country(id: "se"),
-      Country(id: "sg"),
-      Country(id: "si"),
-      Country(id: "sk"),
-      Country(id: "th"),
-      Country(id: "tr"),
-      Country(id: "tw"),
+//      Country(id: "nl"),
+//      Country(id: "no"),
+//      Country(id: "nz"),
+//      Country(id: "ph"),
+//      Country(id: "pl"),
+//      Country(id: "pt"),
+//      Country(id: "ro"),
+//      Country(id: "rs"),
+//      Country(id: "ru"),
+//      Country(id: "sa"),
+//      Country(id: "se"),
+//      Country(id: "sg"),
+//      Country(id: "si"),
+//      Country(id: "sk"),
+//      Country(id: "th"),
+//      Country(id: "tr"),
+//      Country(id: "tw"),
       Country(id: "ua"),
       Country(id: "us"),
-      Country(id: "ve"),
-      Country(id: "za"),
+//      Country(id: "ve"),
+//      Country(id: "za"),
     ];

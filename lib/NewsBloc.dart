@@ -14,6 +14,16 @@ class NewsRepository {
   Future<List<Article>> getNewsByCategoryLimited(String categoryId) =>
       newsDao.getNewsByCategoryLimited(categoryId);
 
+  Future<List<Article>> getTopNewsBySources(List<String> sources) =>
+      newsDao.getTopNewsBySources(sources);
+
+  Future<List<Article>> getNewsByCategory(String cat, {String country}) =>
+      newsDao.getNewsCatNation(cat: cat, country: country);
+
+  Future<List<Article>> getEveryNews(String searchedWord,
+          {List<String> sources, String lang}) =>
+      newsDao.getEveryNews(searchedWord, lang: lang, sources: sources);
+
   Future<List<Source>> getNewsSources() => newsDao.getNewsSources();
 
   List<Country> getCountries() => newsDao.getCountries();
@@ -46,20 +56,29 @@ class NewsBloc {
 //    await newsRepo.addStudent(student);
 //    getNews();
 //  }
+  getNewsBySources(List<String> sources) async {
+    newsController.sink.add(await newsRepo.getTopNewsBySources(sources));
+  }
 
   getNews() async {
     newsController.sink.add(await newsRepo.getNews());
   }
 
-  getNewsByCountry(String countryId) async =>
+  loadNewsByCountry(String countryId) async =>
       newsController.sink.add(await newsRepo.getNewsByCountry(countryId));
+
+  loadTaggedNews(String tag) async =>
+      newsController.sink.add(await newsRepo.getEveryNews(tag));
+
+  loadNewsByCategory({String cat, String country}) async => newsController.sink
+      .add(await newsRepo.getNewsByCategory(cat, country: country));
 }
 
 class SourcesBloc {
   final newsRepo = NewsRepository();
   final controller = StreamController<List<Source>>.broadcast();
 
-  get sources => controller.stream;
+  Stream<List<Source>> get sources => controller.stream;
 
   SourcesBloc() {
     getSources();
@@ -135,7 +154,7 @@ class LimitCatBloc {
     getSciCatLimited();
   }
 
-   Future<bool>get isEmpty async {
+  Future<bool> get isEmpty async {
     return await bizNews.isEmpty.then((value) => null);
   }
 
@@ -166,3 +185,11 @@ class LimitCatBloc {
   getSciCatLimited() async => sciCatController.sink
       .add(await newsRepo.getNewsByCategoryLimited('science'));
 }
+
+get categories => [
+      'general',
+      'business',
+      'sports',
+      'entertainment',
+      'health' /*, 'technology', 'science'*/
+    ];

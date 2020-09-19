@@ -43,6 +43,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   SourcesBloc sourcesBloc = SourcesBloc();
   CountryBloc countryBloc = CountryBloc();
   TagBloc tagBloc = TagBloc();
+  List<String> selectedSources;
+  String selectedCountry;
+  String selectedTag;
+  int selectedCategory;
+  static const appBarHeight = 60.0;
+  static const appBarIconHeight = appBarHeight - 30.0;
+  final appIconColor = Colors.cyan[900];
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
@@ -71,13 +78,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   isMediumScreen(context) => Responsive.isMediumScreen(context);
 
   isSmallScreen(context) => Responsive.isSmallScreen(context);
+
+  isSmallerScreen(context) => Responsive.isSmallerScreen(context);
   bool didSizeChanged = false;
 
   @override
   void didChangeMetrics() {
     // TODO: implement didChangeMetrics
     super.didChangeMetrics();
-    if (isSmallScreen(context) ||
+    if (isSmallerScreen(context) ||
+        isSmallScreen(context) ||
         isMediumLarge(context) ||
         isExtraLargeScreen(context)) {
       print("size changed");
@@ -319,10 +329,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 buildCountryFilter(),
                 buildCatTittleText("Browse By Sources:"),
                 buildSourceFilter(),
-//          DrawerItem(
-//            title: "Go to Home Page",
-//            iconImage: Icons.home,
-//          ),
               ],
             ),
           );
@@ -333,22 +339,37 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return StreamBuilder<List<Source>>(
         stream: sourcesBloc.sources,
         builder: (context, AsyncSnapshot<List<Source>> snapshot) {
+          var fewSources = snapshot.data?.sublist(0, 10);
           return snapshot.hasData
               ? Wrap(
                   spacing: 8.0, // gap between adjacent chips
                   runSpacing: 4.0,
-                  children: snapshot.data
-                      .sublist(0, 10)
+                  children: fewSources
                       .map((source) => getChip(source.id,
                               selected: source.selected, onSelected: (value) {
                             setState(() {
                               source.selected = !source.selected;
+                              //Load only selected Source
+                              selectedSources = getSelectedSource(fewSources);
+//                              print(selectedSources);
+                              selectedSources.length > 0
+                                  ? newsBloc.getNewsBySources(selectedSources)
+                                  : newsBloc.getNews();
                             });
                           }))
                       .toList(),
                 )
               : Text("Loading Sources...");
         });
+  }
+
+  List<String> getSelectedSource(List<Source> fewSources) {
+    List<String> list = fewSources
+        .map((selectedSource) =>
+            selectedSource.selected ? selectedSource.name : null)
+        .toList();
+    list.retainWhere((source) => source != null);
+    return list;
   }
 
   Widget buildCountryFilter() {
@@ -359,12 +380,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         SizedBox(height: 10),
         ...NewsRepository()
             .getCountries()
-            .sublist(0, 10)
             .map((country) => getChip(country.name,
                     avatar: Flag(country.id),
                     selected: country.selected, onSelected: (value) {
                   setState(() {
-                    country.selected = !country.selected;
+//                    country.selected = true;
+                    //Load only selected countries
+                    selectedCountry = country.id;
+                    loadSelectCatNews(selectedCategory);
+//                    newsBloc.loadNewsByCountry(selectedCountry);
                   });
                 }))
             .toList(),
@@ -385,7 +409,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             .map((tag) =>
                 getChip(tag.name, selected: tag.selected, onSelected: (value) {
                   setState(() {
-                    tag.selected = !tag.selected;
+//                    tag.selected = !tag.selected;
+                    //Load only selected Tags
+                    selectedTag = tag.name;
+                    newsBloc.loadTaggedNews(selectedTag);
                   });
                 }))
             .toList(),
@@ -394,23 +421,54 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
-  MyCustomAppBar buildAppBar(BuildContext context) {
-    var appBarHeight = 60.0;
-    var appIconColor = Colors.cyan[900] /*Colors.grey[800]*/;
-    var appBarIconHeight = appBarHeight - 25.0;
-    return MyCustomAppBar(
-      height: appBarHeight,
-      leading: buildLeadingChild(
-          appBarHeight, context, appBarIconHeight, appIconColor),
-      child: isMediumLarge(context) || isExtraLargeScreen(context)
-          ? buildCenterChild(appBarIconHeight, appIconColor)
-          : SizedBox(),
-      trailing: buildTrailingChild(context),
-    );
+  Widget buildAppBar(BuildContext context) {
+    return isSmallerScreen(context)
+        ? AppBar(
+            toolbarHeight: 100,
+            leading: IconButton(
+              iconSize: appBarIconHeight,
+              color: appIconColor,
+              icon: Icon(Icons.menu),
+              onPressed: toggleDrawer,
+            ),
+            centerTitle: true,
+            title: Text("Daily News",
+                style: GoogleFonts.josefinSans(
+                    fontSize: 20, textStyle: TextStyle(color: Colors.black))),
+            backgroundColor: Colors.white,
+            actions: [
+              RoundIcon(
+                  icon: Icons.search,
+                  onPress: () {
+                    Scaffold.of(context).openDrawer();
+                  }),
+              RoundIcon(
+                  icon: Icons.expand_more,
+                  onPress: () {
+                    Scaffold.of(context).openDrawer();
+                  }),
+//              buildTabIconButton(Icons.more_vert, () {}),
+              SizedBox(width: 20),
+//              buildTabIconButton(Icons.more_vert, () {}),
+            ],
+            bottom: MyCustomAppBar(
+                height: appBarHeight,
+//              leading: buildLeadingChild(context),
+                child: buildCenterChild()
+//              trailing: buildTrailingChild(context),
+                ),
+          )
+        : MyCustomAppBar(
+            height: appBarHeight,
+            leading: buildLeadingChild(context),
+            child: isMediumLarge(context) || isExtraLargeScreen(context)
+                ? buildCenterChild()
+                : SizedBox(),
+            trailing: buildTrailingChild(context),
+          );
   }
 
-  Row buildLeadingChild(double appBarHeight, context, double appBarIconHeight,
-      Color appIconColor) {
+  Row buildLeadingChild(context) {
     return Row(
       children: [
         SizedBox(
@@ -471,53 +529,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
-  Container buildCenterChild(double appBarIconHeight, Color appIconColor) {
+  Container buildCenterChild() {
     return Container(
       color: Colors.white,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          IconButton(
-            iconSize: appBarIconHeight,
-            color: appIconColor,
-            icon: Icon(MyFlutterApp.home),
-            onPressed: toggleDrawer,
-          ),
-          IconButton(
-            iconSize: appBarIconHeight,
-            color: appIconColor,
-            icon: Icon(MyFlutterApp.money),
-            onPressed: toggleDrawer,
-          ),
-          IconButton(
-            color: appIconColor,
-            iconSize: appBarIconHeight,
-            icon: Icon(MyFlutterApp.football_ball),
-            onPressed: toggleDrawer,
-          ),
-          IconButton(
-            color: appIconColor,
-            iconSize: appBarIconHeight,
-            icon: Icon(MyFlutterApp.movie_filter),
-            onPressed: toggleDrawer,
-          ),
-          IconButton(
-            iconSize: appBarIconHeight,
-            color: appIconColor,
-            icon: Icon(MyFlutterApp.health),
-            onPressed: toggleDrawer,
-          ),
+          buildTabIconButton(MyFlutterApp.home, () => loadSelectCatNews(0)),
+          buildTabIconButton(MyFlutterApp.money, () => loadSelectCatNews(1)),
+          buildTabIconButton(
+              MyFlutterApp.football_ball, () => loadSelectCatNews(2)),
+          buildTabIconButton(
+              MyFlutterApp.movie_filter, () => loadSelectCatNews(3)),
+          buildTabIconButton(MyFlutterApp.health, () => loadSelectCatNews(4)),
           isMediumScreen(context) || isLargeScreen(context)
-              ? IconButton(
-                  color: appIconColor,
-                  iconSize: appBarIconHeight,
-                  icon: Icon(Icons.menu),
-                  onPressed: toggleDrawer,
-                )
+              ? buildTabIconButton(Icons.menu, toggleDrawer)
               : null,
         ]..remove(null),
       ),
+    );
+  }
+
+  Widget buildTabIconButton(IconData icon, void btnClick()) {
+    return IconButton(
+      color: appIconColor,
+      iconSize: appBarIconHeight,
+      icon: Icon(icon),
+      onPressed: btnClick,
     );
   }
 
@@ -528,6 +567,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _scaffoldKey.currentState.openDrawer();
       setState(() {});
     }
+  }
+
+  void loadSelectCatNews(catIndex) {
+    selectedCategory = catIndex;
+    print(catIndex);
+    newsBloc.loadNewsByCategory(
+        cat: catIndex > 0 ? categories[catIndex] : null,
+        country: selectedCountry);
   }
 }
 
@@ -576,39 +623,42 @@ class NewsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-//      borderRadius: BorderRadius.circular(5),
-      elevation: 2,
-      child: Column(
-        children: [
-          image != null
-              ? Container(
-                  constraints: BoxConstraints.expand(height: imageHeight),
-                  child: Stack(
-                    children: [
-                      Container(
-                        alignment: Alignment.center,
-                        child: Image.network(image,
-                            height: imageHeight,
-                            width: double.infinity,
-                            fit: BoxFit.cover),
-                      ),
-                      buildTittle(),
-                    ],
-                  ),
-                )
-              : buildTittle(),
-          content != null ? buildSummary() : SizedBox(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Material(color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        elevation: 2,
+        child: Column(
+          children: [
+            image != null
+                ? Container(
+                    constraints: BoxConstraints.expand(height: imageHeight),
+                    child: Stack(
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          child: Image.network(image,
+                              height: imageHeight,
+                              width: double.infinity,
+                              fit: BoxFit.cover),
+                        ),
+                        buildTittle(),
+                      ],
+                    ),
+                  )
+                : buildTittle(),
+            content != null ? buildSummary() : SizedBox(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 //            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              buildFlatButton(() {}, Icons.share, "Share"),
-              buildFlatButton(() {}, Icons.remove_red_eye, "Visit"),
-              buildFlatButton(() {}, Icons.bookmark_border, "Save"),
-            ],
-          )
-        ],
+              children: [
+                buildFlatButton(() {}, Icons.share, "Share"),
+                buildFlatButton(() {}, Icons.remove_red_eye, "Visit"),
+                buildFlatButton(() {}, Icons.bookmark_border, "Save"),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -637,7 +687,7 @@ class NewsItem extends StatelessWidget {
                   textStyle: TextStyle(fontSize: 14)),
 //          overflow: TextOverflow.fade,
 //          maxLines: 3,
-//          softWrap: true,
+//          softWrap: false,
             ),
           ),
         ],
