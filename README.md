@@ -42,14 +42,20 @@ Flutter is a great because of it cross platform hotReload solution, i just think
 * Filter News by Source(e.g bbc and abc News)
 * Filter News by Tag
 
-## Download
+## Install && Run the App on your device
 **Run the App on your brower with this link:**
 https://shittu33.github.io/ResponsiveNewsApp
 **Download the APK with this link:**
 
-## Setup
+## Build your own news App
 * Clone the repository
-* run flutter pub get command
+```cmd
+git clone https://github.com/shittu33/ResponsiveNewsApp
+```
+* run flutter pub get command in your terminal
+```cmd
+flutter pub get
+```
 * Got to [News API](https://newsapi.org) website, create an account an optain your APi key
 * inside the /lib folder create a file named config.dart and place the following code:
 ``` Dart
@@ -60,3 +66,6 @@ const NEWS_API_KEY = "PASTE_YOUR_API_KEY_HERE";
 flutter pub run build_runner build
 ```
 * If everything goes fine, you can now build and run the App!!!
+
+### Customize it
+...coming soon...
