@@ -7,7 +7,7 @@ import 'config.dart';
 
 part 'news.g.dart';
 
-@RestApi(baseUrl: "http://newsapi.org/v2/")
+@RestApi(baseUrl: "https://newsapi.org/v2/")
 abstract class NewsClient {
   factory NewsClient(Dio dio) = _NewsClient;
 
