@@ -62,6 +62,3 @@ const NEWS_API_KEY = "PASTE_YOUR_API_KEY_HERE";
 flutter pub run build_runner build
 ```
 * If everything goes fine, you can now build and run the App!!!
-
-### Customize it
-...coming soon...
