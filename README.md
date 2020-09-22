@@ -9,6 +9,9 @@ This App fetch news update from the internet. it's a responsive app that support
 
 ![ScreenShot](https://github.com/shittu33/ResponsiveNewsApp/blob/master/screen.PNG?raw=true)
 
+## Demo
+
+https://youtu.be/0cqSNDhN_OQ
 
 ## Moltivation
 Flutter is a great because of it cross platform hotReload solution, i just think it will be a great idea to write one codebase News App that can run both on my PC and phone, and also filter those update to fit my need.
