@@ -73,7 +73,21 @@ class TestScreen extends StatelessWidget {
   Future<String> fetchStudent() async {
     final response = await http
         .get('https://abdulmujeeb-nodejs-news.herokuapp.com/news'
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 //
+=======
+=======
+>>>>>>> Stashed changes
+//        , headers: {
+//      'Content-Type': 'application/json',
+//      'Access-Control-Allow-Credentials': 'true', 
+//      'Access-Control-Allow-Origin': '*'
+//    }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     );
 
     if (response.statusCode == 200) {
