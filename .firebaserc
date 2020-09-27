@@ -1,0 +1,10 @@
+{
+  "projects": {
+    "default": "mydailynewsapp"
+  },
+  "targets": {
+    "mydailynewsapp": {
+      "hosting": {}
+    }
+  }
+}

@@ -6,9 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:newsapp/NewsBloc.dart';
 import 'package:newsapp/my_flutter_app_icons.dart';
 import 'package:newsapp/news.dart';
+import 'package:newsapp/newsDetails.dart';
 import 'package:newsapp/responsive.dart';
+import 'package:newsapp/widget/custom_widget.dart';
 
-import 'TabWidgets.dart';
+import 'widget/TabWidgets.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,7 +26,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+//      home: MyHomePage(title: 'Flutter Demo Home Page'),
+   home: TestScreen(),
     );
   }
 }
@@ -46,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   List<String> selectedSources;
   String selectedCountry;
   String selectedTag;
-  int selectedCategory;
+  int selectedCategory=0;
   static const appBarHeight = 60.0;
   static const appBarIconHeight = appBarHeight - 30.0;
   final appIconColor = Colors.cyan[900];
@@ -82,6 +85,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   isSmallerScreen(context) => Responsive.isSmallerScreen(context);
   bool didSizeChanged = false;
 
+  bool isMediumLarge(BuildContext context) =>
+      isMediumScreen(context) || isLargeScreen(context);
+
   @override
   void didChangeMetrics() {
     // TODO: implement didChangeMetrics
@@ -103,25 +109,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       body: Scaffold(
         key: _scaffoldKey,
         drawer: isExtraLargeScreen(context) ? null : buildDrawer(),
-        body: StreamBuilder<List<Article>>(
-            stream: newsBloc.news,
-            builder: (context, newsSnap) {
-              if (newsSnap.hasData) {
-                var newsData = newsSnap.data;
-                return (Flex(
-                    direction: Axis.horizontal,
-                    children: [
-                      isExtraLargeScreen(context)
-                          ? Expanded(flex: 20, child: buildMenuList())
-                          : null,
-                      Expanded(flex: 55, child: buildNewsList(newsData)),
-                      isLargeScreen(context) || isExtraLargeScreen(context)
-                          ? Expanded(flex: 25, child: buildRightMenu())
-                          : null
-                    ]..removeWhere((value) => value == null)));
-              } else
-                return CircularProgressIndicator();
-            }),
+        body: buildMainPage(),
       ),
       floatingActionButton: FloatingActionButton.extended(
         elevation: 6,
@@ -132,29 +120,223 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           color: Colors.black,
         ),
         label: Text(
-          "Add News",
+          "Load More",
           style: GoogleFonts.josefinSans(color: Colors.black),
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  Widget getChip(name,
-      {bool selected,
-      Color selectedColor,
-      Widget avatar,
-      Function(bool value) onSelected}) {
-    return FilterChip(
-      selected: selected != null ? selected : false,
-      selectedColor:
-          selectedColor != null ? selectedColor : Colors.cyan.shade600,
-      disabledColor: Colors.black87,
-      backgroundColor: Colors.black87,
-      avatar: avatar,
-      labelStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      label: Text("#$name"),
-      onSelected: onSelected != null ? onSelected : () {},
+  StreamBuilder<List<Article>> buildMainPage() {
+    return StreamBuilder<List<Article>>(
+        stream: newsBloc.news,
+        builder: (context, newsSnap) {
+          if (newsSnap.hasData) {
+            var newsData = newsSnap.data;
+            return (Flex(
+                direction: Axis.horizontal,
+                children: [
+                  isExtraLargeScreen(context)
+                      ? Expanded(flex: 20, child: buildMenuList())
+                      : null,
+                  Expanded(flex: 55, child: buildNewsList(newsData)),
+                  isLargeScreen(context) || isExtraLargeScreen(context)
+                      ? Expanded(flex: 25, child: buildRightMenu())
+                      : null
+                ]..removeWhere((value) => value == null)));
+          } else
+            return CircularProgressIndicator();
+        });
+  }
+
+  Widget buildAppBar(BuildContext context) {
+    return isSmallerScreen(context) || isSmallScreen(context)
+        ? AppBar(
+            toolbarHeight: 110,
+            leading: buildWidgetOnCondition(
+                isSmallerScreen(context), buildLeadingChild(context),
+                altWidget: buildLeadingChild(context)),
+            centerTitle: false,
+            leadingWidth: isSmallerScreen(context) || isSmallScreen(context)
+                ? appBarHeight + 5
+                : 150,
+            title: buildWidgetOnCondition(
+//                false,
+                isSmallerScreen(context) || isSmallScreen(context),
+                Padding(
+                  padding: const EdgeInsets.only(right: 0.0),
+                  child: RoundSearchBar(
+                    height: 45.0,
+                    prefixIcon: Icons.menu,
+                    prefixIconColor: appIconColor,
+                    label: "search News",
+                    initialText: "search something",
+                    txtController: txtController,
+                    iconTap: toggleDrawer,
+                    onSubmitted: (searchedText) =>
+                        newsBloc.loadTaggedNews(searchedText),
+                  ),
+                )),
+            backgroundColor: Colors.white,
+            actions: buildTrailingChild(context),
+            bottom:
+                MyCustomAppBar(height: appBarHeight, child: buildCenterChild()),
+          )
+        : MyCustomAppBar(
+            height: appBarHeight,
+            leading: buildLeadingChild(context),
+            child: buildCenterChild(),
+            trailing: Row(children: buildTrailingChild(context)),
+          );
+  }
+
+  final TextEditingController txtController = TextEditingController();
+
+  Row buildLeadingChild(context) {
+    var isSmaller = isSmallerScreen(context);
+    return Row(
+      children: [
+        SizedBox(
+          width: 3,
+        ),
+        Icon(
+          Icons.face,
+          color: Colors.cyan,
+          size: appBarHeight,
+        ),
+        buildWidgetOnCondition(
+            !isSmaller,
+            SizedBox(
+              width: 3,
+            )),
+        buildWidgetOnCondition(
+          isMediumLarge(context),
+          RoundIcon(
+              icon: Icons.search,
+              onPress: () {
+                Scaffold.of(context).openDrawer();
+              }),
+          altWidget: isExtraLargeScreen(context)
+              ? RoundSearchBar(
+                  height: 43,
+                  width: 200,
+                  label: "search News",
+                  initialText: "search something",
+                  txtController: txtController,
+                  iconTap: toggleDrawer,
+                  onSubmitted: (searchedText) =>
+                      newsBloc.loadTaggedNews(searchedText),
+                )
+              : Container(),
+        ),
+      ],
     );
+  }
+
+  List<Widget> buildTrailingChild(BuildContext context) {
+    var isSmaller = isSmallerScreen(context);
+    return [
+      buildWidgetOnCondition(
+        !isSmaller,
+        RoundIcon(
+            icon: Icons.add,
+            onPress: () {
+              Scaffold.of(context).openDrawer();
+            }),
+      ),
+      buildWidgetOnCondition(
+        !isSmaller,
+        RoundIcon(
+            icon: Icons.sync,
+            onPress: () {
+              Scaffold.of(context).openDrawer();
+            }),
+      ),
+      RoundIcon(
+          icon: Icons.alarm,
+          onPress: () {
+            Scaffold.of(context).openDrawer();
+          }),
+      RoundIcon(
+          icon: Icons.expand_more,
+          onPress: () {
+            Scaffold.of(context).openDrawer();
+          }),
+    ];
+  }
+
+  buildCenterChild() {
+    var isRequireMenuBtn = isMediumScreen(context) || isLargeScreen(context);
+    return TabWidget(
+      tabsList: [
+        buildTabIconButton(MyFlutterApp.home),
+        buildTabIconButton(MyFlutterApp.money),
+        buildTabIconButton(MyFlutterApp.football_ball),
+        buildTabIconButton(MyFlutterApp.movie_filter),
+        buildTabIconButton(MyFlutterApp.health),
+        isRequireMenuBtn ? buildTabIconButton(Icons.menu) : null,
+      ]..remove(null),
+      onTap: (index, tabsList) {
+        isRequireMenuBtn && index == tabsList.length - 1
+            ? toggleDrawer()
+            : loadSelectCatNews(index);
+      },
+    );
+  }
+
+  Widget buildTabIconButton(IconData icon) {
+    return Tab(
+      iconMargin: const EdgeInsets.all(0),
+      icon: Icon(
+        icon,
+        color: appIconColor,
+        size: appBarIconHeight,
+      ),
+    );
+  }
+
+  Drawer buildDrawer() {
+    return Drawer(
+      child: buildMenuList(),
+    );
+  }
+
+  Widget buildMenuList() {
+    return FutureBuilder(
+        future: sourcesBloc.sources.first,
+        builder: (BuildContext context, AsyncSnapshot<List<Source>> snapshot) {
+          if (snapshot.hasError || !snapshot.hasData) {
+            sourcesBloc = SourcesBloc();
+          }
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                buildCatTittleText("Filter By Country:"),
+                buildCountryFilter(),
+                buildCatTittleText("Browse By Sources:"),
+                buildSourceFilter(),
+              ],
+            ),
+          );
+        });
+  }
+
+  Text buildCatTittleText(String label) {
+    return Text(
+      label,
+      style: GoogleFonts.josefinSans(fontWeight: FontWeight.bold, fontSize: 20),
+    );
+  }
+
+  toggleDrawer() async {
+    if (_scaffoldKey.currentState.isDrawerOpen) {
+      _scaffoldKey.currentState.openEndDrawer();
+    } else {
+      _scaffoldKey.currentState.openDrawer();
+      setState(() {});
+    }
   }
 
   Widget buildRightMenu() {
@@ -233,55 +415,48 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ]);
   }
 
-  Text buildCatTittleText(String label) {
-    return Text(
-      label,
-      style: GoogleFonts.josefinSans(fontWeight: FontWeight.bold, fontSize: 20),
-    );
-  }
-
-  Container buildSubCategoryItem(BuildContext context, newsData) {
+  Widget buildSubCategoryItem(BuildContext context, newsData) {
     var largeHeight = 200.0;
     var smallHeight = 160.0;
     var image = newsData.urlToImage;
-    return Container(
-      height: isMediumLarge(context) ? largeHeight : smallHeight,
+    return GestureDetector(
+      onTap: () => LoadDetailsScreen(context, newsData.url),
+      child: Container(
+        height: isMediumLarge(context) ? largeHeight : smallHeight,
 //                      constraints: BoxConstraints.expand(width:120),
-      child: Material(
-        borderRadius: BorderRadius.circular(8),
-        elevation: 4,
-        child: Flex(
-          direction: Axis.horizontal,
-          crossAxisAlignment: isMediumLarge(context)
-              ? CrossAxisAlignment.center
-              : CrossAxisAlignment.start,
-          mainAxisAlignment: isMediumLarge(context)
-              ? MainAxisAlignment.center
-              : MainAxisAlignment.start,
-          children: [
-            Expanded(
-                child: Image.network(
-              image != null ? image : "",
-              height: isMediumLarge(context) ? largeHeight : smallHeight,
-              fit: BoxFit.cover,
-            )),
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(newsData.title,
-                  style: GoogleFonts.josefinSans(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54,
-                      fontSize: 18)),
-            ))
-          ],
+        child: Material(
+          borderRadius: BorderRadius.circular(8),
+          elevation: 4,
+          child: Flex(
+            direction: Axis.horizontal,
+            crossAxisAlignment: isMediumLarge(context)
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
+            mainAxisAlignment: isMediumLarge(context)
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
+            children: [
+              Expanded(
+                  child: Image.network(
+                image != null ? image : "",
+                height: isMediumLarge(context) ? largeHeight : smallHeight,
+                fit: BoxFit.cover,
+              )),
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(newsData.title,
+                    style: GoogleFonts.josefinSans(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                        fontSize: 18)),
+              ))
+            ],
+          ),
         ),
       ),
     );
   }
-
-  bool isMediumLarge(BuildContext context) =>
-      isMediumScreen(context) || isLargeScreen(context);
 
   Widget buildNewsList(List<Article> newsData) {
 //    var windowWidth = MediaQuery.of(context).size.width;
@@ -301,38 +476,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               var content = currentNews.content;
               var photo = currentNews.urlToImage;
               var title = currentNews.title;
-              return NewsItem(title: title, image: photo, content: content);
+              var newsUrl = currentNews.url;
+              return NewsItem(
+                  title: title,
+                  image: photo,
+                  content: content,
+                  newsUrl: newsUrl);
             }),
       ),
     );
-  }
-
-  Drawer buildDrawer() {
-    return Drawer(
-      child: buildMenuList(),
-    );
-  }
-
-  Widget buildMenuList() {
-    return FutureBuilder(
-        future: sourcesBloc.sources.first,
-        builder: (BuildContext context, AsyncSnapshot<List<Source>> snapshot) {
-          if (snapshot.hasError || !snapshot.hasData) {
-            sourcesBloc = SourcesBloc();
-          }
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                buildCatTittleText("Filter By Country:"),
-                buildCountryFilter(),
-                buildCatTittleText("Browse By Sources:"),
-                buildSourceFilter(),
-              ],
-            ),
-          );
-        });
   }
 
   StreamBuilder<List<Source>> buildSourceFilter() {
@@ -364,12 +516,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   List<String> getSelectedSource(List<Source> fewSources) {
-    List<String> list = fewSources
+    return fewSources
         .map((selectedSource) =>
             selectedSource.selected ? selectedSource.name : null)
-        .toList();
-    list.retainWhere((source) => source != null);
-    return list;
+        .toList()
+          ..retainWhere((source) => source != null);
   }
 
   Widget buildCountryFilter() {
@@ -384,12 +535,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     avatar: Flag(country.id),
                     selected: country.selected, onSelected: (value) {
                   setState(() {
-//                    country.selected = true;
-                    //Load only selected countries
                     selectedCountry = country.id;
                     loadSelectCatNews(selectedCategory);
-//                    newsBloc.loadNewsByCountry(selectedCountry);
                   });
+                  toggleDrawer();
                 }))
             .toList(),
         SizedBox(height: 10),
@@ -421,152 +570,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget buildAppBar(BuildContext context) {
-    return isSmallerScreen(context)
-        ? AppBar(
-            toolbarHeight: 100,
-            leading: IconButton(
-              iconSize: appBarIconHeight,
-              color: appIconColor,
-              icon: Icon(Icons.menu),
-              onPressed: toggleDrawer,
-            ),
-            centerTitle: true,
-            title: Text("Daily News",
-                style: GoogleFonts.josefinSans(
-                    fontSize: 20, textStyle: TextStyle(color: Colors.black))),
-            backgroundColor: Colors.white,
-            actions: [
-              RoundIcon(
-                  icon: Icons.search,
-                  onPress: () {
-                    Scaffold.of(context).openDrawer();
-                  }),
-              RoundIcon(
-                  icon: Icons.expand_more,
-                  onPress: () {
-                    Scaffold.of(context).openDrawer();
-                  }),
-//              buildTabIconButton(Icons.more_vert, () {}),
-              SizedBox(width: 20),
-//              buildTabIconButton(Icons.more_vert, () {}),
-            ],
-            bottom: MyCustomAppBar(
-                height: appBarHeight,
-//              leading: buildLeadingChild(context),
-                child: buildCenterChild()
-//              trailing: buildTrailingChild(context),
-                ),
-          )
-        : MyCustomAppBar(
-            height: appBarHeight,
-            leading: buildLeadingChild(context),
-            child: isMediumLarge(context) || isExtraLargeScreen(context)
-                ? buildCenterChild()
-                : SizedBox(),
-            trailing: buildTrailingChild(context),
-          );
-  }
-
-  Row buildLeadingChild(context) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 10,
-        ),
-        Icon(
-          Icons.face,
-          color: Colors.cyan,
-          size: appBarHeight,
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        RoundIcon(
-            icon: Icons.search,
-            onPress: () {
-              Scaffold.of(context).openDrawer();
-            }),
-        SizedBox(
-          width: 10,
-        ),
-        isSmallScreen(context)
-            ? IconButton(
-                iconSize: appBarIconHeight,
-                color: appIconColor,
-                icon: Icon(Icons.menu),
-                onPressed: toggleDrawer,
-              )
-            : SizedBox(),
-      ],
+  Widget getChip(name,
+      {bool selected,
+      Color selectedColor,
+      Widget avatar,
+      Function(bool value) onSelected}) {
+    return FilterChip(
+      selected: selected != null ? selected : false,
+      selectedColor:
+          selectedColor != null ? selectedColor : Colors.cyan.shade600,
+      disabledColor: Colors.black87,
+      backgroundColor: Colors.black87,
+      avatar: avatar,
+      labelStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      label: Text("#$name"),
+      onSelected: onSelected != null ? onSelected : () {},
     );
-  }
-
-  Row buildTrailingChild(BuildContext context) {
-    return Row(
-      children: [
-        RoundIcon(
-            icon: Icons.add,
-            onPress: () {
-              Scaffold.of(context).openDrawer();
-            }),
-        RoundIcon(
-            icon: Icons.sync,
-            onPress: () {
-              Scaffold.of(context).openDrawer();
-            }),
-        RoundIcon(
-            icon: Icons.alarm,
-            onPress: () {
-              Scaffold.of(context).openDrawer();
-            }),
-        RoundIcon(
-            icon: Icons.expand_more,
-            onPress: () {
-              Scaffold.of(context).openDrawer();
-            }),
-      ],
-    );
-  }
-
-  Container buildCenterChild() {
-    return Container(
-      color: Colors.white,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          buildTabIconButton(MyFlutterApp.home, () => loadSelectCatNews(0)),
-          buildTabIconButton(MyFlutterApp.money, () => loadSelectCatNews(1)),
-          buildTabIconButton(
-              MyFlutterApp.football_ball, () => loadSelectCatNews(2)),
-          buildTabIconButton(
-              MyFlutterApp.movie_filter, () => loadSelectCatNews(3)),
-          buildTabIconButton(MyFlutterApp.health, () => loadSelectCatNews(4)),
-          isMediumScreen(context) || isLargeScreen(context)
-              ? buildTabIconButton(Icons.menu, toggleDrawer)
-              : null,
-        ]..remove(null),
-      ),
-    );
-  }
-
-  Widget buildTabIconButton(IconData icon, void btnClick()) {
-    return IconButton(
-      color: appIconColor,
-      iconSize: appBarIconHeight,
-      icon: Icon(icon),
-      onPressed: btnClick,
-    );
-  }
-
-  toggleDrawer() async {
-    if (_scaffoldKey.currentState.isDrawerOpen) {
-      _scaffoldKey.currentState.openEndDrawer();
-    } else {
-      _scaffoldKey.currentState.openDrawer();
-      setState(() {});
-    }
   }
 
   void loadSelectCatNews(catIndex) {
@@ -614,21 +633,25 @@ class NewsItem extends StatelessWidget {
     @required this.image,
     @required this.content,
     this.news,
+    this.newsUrl,
   }) : super(key: key);
 
   final String title;
   final String image;
   final String content;
+  final String newsUrl;
   final Article news;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Material(color: Colors.white,
+      child: Material(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         elevation: 2,
-        child: Column(
+        child: Flex(
+          direction: Axis.vertical,
           children: [
             image != null
                 ? Container(
@@ -642,18 +665,19 @@ class NewsItem extends StatelessWidget {
                               width: double.infinity,
                               fit: BoxFit.cover),
                         ),
-                        buildTittle(),
+                        buildTittle(context, newsUrl),
                       ],
                     ),
                   )
-                : buildTittle(),
+                : buildTittle(context, newsUrl),
             content != null ? buildSummary() : SizedBox(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 //            crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 buildFlatButton(() {}, Icons.share, "Share"),
-                buildFlatButton(() {}, Icons.remove_red_eye, "Visit"),
+                buildFlatButton(() => LoadDetailsScreen(context, newsUrl),
+                    Icons.remove_red_eye, "Visit"),
                 buildFlatButton(() {}, Icons.bookmark_border, "Save"),
               ],
             )
@@ -676,26 +700,20 @@ class NewsItem extends StatelessWidget {
   Widget buildSummary() {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-      child: Flex(
-        direction: Axis.horizontal,
-        children: [
-          Expanded(
-            child: Text(
-              content,
-              style: GoogleFonts.neucha(
-                  fontWeight: FontWeight.w600,
-                  textStyle: TextStyle(fontSize: 14)),
+      child: Text(
+        content,
+        style: GoogleFonts.neucha(
+//fontSize: 23,
+            fontWeight: FontWeight.w600,
+            textStyle: TextStyle(fontSize: 14)),
 //          overflow: TextOverflow.fade,
 //          maxLines: 3,
 //          softWrap: false,
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  Widget buildTittle() {
+  Widget buildTittle(BuildContext context, String newsUrl) {
     return Container(
       alignment: Alignment.bottomLeft,
       child: Padding(
@@ -704,16 +722,21 @@ class NewsItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Material(
-              borderRadius: BorderRadius.circular(15),
-              child: Container(
-                color: Colors.cyan,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Read more",
-                    style: GoogleFonts.acme(
-                        textStyle: TextStyle(color: Colors.black87)),
+            GestureDetector(
+              onTap: () {
+                LoadDetailsScreen(context, newsUrl);
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  color: Colors.cyan,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Read more",
+                      style: GoogleFonts.acme(
+                          textStyle: TextStyle(color: Colors.black87)),
+                    ),
                   ),
                 ),
               ),
@@ -740,6 +763,23 @@ class NewsItem extends StatelessWidget {
   }
 }
 
+Future LoadDetailsScreen(BuildContext context, String newsUrl) {
+  return Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => DetailsScreen(
+                newsUrl: newsUrl,
+              )));
+}
+
+Future LoadTestScreen(BuildContext context, String newsUrl) {
+  return Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => TestScreen(
+              )));
+}
+
 class DrawerItem extends StatelessWidget {
   const DrawerItem({
     Key key,
@@ -762,3 +802,7 @@ class DrawerItem extends StatelessWidget {
     );
   }
 }
+
+Widget buildWidgetOnCondition(bool condition, Widget widget,
+        {Widget altWidget}) =>
+    condition ? widget : (altWidget == null ? Container() : altWidget);

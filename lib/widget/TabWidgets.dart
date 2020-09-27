@@ -36,8 +36,8 @@ class CollapseAppBar extends StatelessWidget {
   }
 }
 
-class TabWidget extends StatelessWidget {
-  TabWidget(
+class SilverTabWidget extends StatelessWidget {
+  SilverTabWidget(
       {Key key,
       @required this.tabsList,
       this.unselectedColor,
@@ -101,6 +101,40 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
+class TabWidget extends StatelessWidget {
+  TabWidget(
+      {Key key,
+      @required this.tabsList,
+      this.unselectedColor,
+      this.selectedColor,
+      this.initial = 0,
+      this.onTap})
+      : super(key: key);
+
+  final List<Tab> tabsList;
+  final Color unselectedColor;
+  final Color selectedColor;
+  final int initial;
+  final Function(int pos, List<Tab> tabsList) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+//      initialIndex: initial==0?0:initial,
+      length: tabsList.length,
+      child: TabBar(
+//        controller: DefaultTabController.of(context),
+          onTap: (index) {
+            onTap(index,tabsList);
+          },
+          indicatorColor: selectedColor,
+          unselectedLabelColor: unselectedColor,
+          labelColor: selectedColor,
+          tabs: tabsList),
+    );
+  }
+}
+
 class MyCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
   final Widget leading;
@@ -117,30 +151,34 @@ class MyCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    const CenterGap = 20.0;
-    return Column(children: [
-      Material(
-        elevation: 2,
-        color: Colors.white,
-        child: Padding(
-          padding: EdgeInsets.all(0),
-          child: Flex(
-            direction: Axis.horizontal,
-            children: [
-              leading,
-              SizedBox(
+    const CenterGap = 10.0;
+    return Material(
+      elevation: 2,
+      color: Colors.white,
+      child: Padding(
+        padding: EdgeInsets.all(0),
+        child: Flex(
+          direction: Axis.horizontal,
+          children: [
+            leading,
+            Expanded(
+              flex:13,
+              child: SizedBox(
                 width: CenterGap,
               ),
-              Expanded(child: child),
-              SizedBox(
+            ),
+            Expanded(flex:78,child: child),
+            Expanded(
+              flex:13,
+              child: SizedBox(
                 width: CenterGap,
               ),
-              trailing,
-            ]..removeWhere((element) => element == null),
-          ),
+            ),
+            trailing,
+          ]..removeWhere((element) => element == null),
         ),
       ),
-    ]);
+    );
   }
 
   @override
