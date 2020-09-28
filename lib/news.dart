@@ -7,7 +7,9 @@ import 'config.dart';
 
 part 'news.g.dart';
 
-@RestApi(baseUrl: "https://newsapi.org/v2/")
+//@RestApi(baseUrl: "https://abdulmujeeb-nodejs-news.herokuapp.com/")
+@RestApi(baseUrl: "http://localhost:3000/")
+//@RestApi(baseUrl: "https://newsapi.org/v2/")
 abstract class NewsClient {
   factory NewsClient(Dio dio) = _NewsClient;
 
