@@ -55364,7 +55364,7 @@ r.l5$=new B.Ml(H.d([],t.r7))
 this.a=r
 q=new B.a1Y(r)
 P.bs(r,"_dio")
-q.b="http://localhost:3000/"
+q.b="https://abdulmujeeb-nodejs-news.herokuapp.com/"
 this.b=q},
 e9:function(){return this.b.e9().aY(0,new B.Tg(),t.R)},
 IZ:function(a,b){var s,r=a==null,q=!r
