@@ -48,8 +48,7 @@ Flutter is a great because of it cross platform hotReload solution, i just think
 
 ## Install && Run the App on your device
 
-**Run the App on your brower with this link:
-**
+## Run the App on your brower with this link:
 https://shittu33.github.io/ResponsiveNewsApp 
 
 ### APK
