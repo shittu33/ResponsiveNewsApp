@@ -772,14 +772,6 @@ Future LoadDetailsScreen(BuildContext context, String newsUrl) {
               )));
 }
 
-Future LoadTestScreen(BuildContext context, String newsUrl) {
-  return Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => TestScreen(
-              )));
-}
-
 class DrawerItem extends StatelessWidget {
   const DrawerItem({
     Key key,
