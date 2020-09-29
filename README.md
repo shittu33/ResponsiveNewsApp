@@ -53,7 +53,7 @@ https://shittu33.github.io/ResponsiveNewsApp
 
 ### APK
 instead Download the raw APK by clicking
-[here](https://github.com/user/repo/blob/master/news.apk)
+[here](https://github.com/shittu33/ResponsiveNewsApp/blob/master/news.apk)
 
 
 
