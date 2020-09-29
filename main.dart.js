@@ -55459,7 +55459,7 @@ while(true)switch(s){case 0:o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/top-headlines?category=general",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$e9)
+return P.a2(p.a.hU(0,"/top-headlines?category=general/*&apiKey=52c90e67f4164e4f8cadab7c05274ea8*/",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$e9)
 case 3:q=m.pm(b.a)
 s=1
 break
@@ -55473,7 +55473,7 @@ o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/top-headlines?country="+a,P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$of)
+return P.a2(p.a.hU(0,"/top-headlines?country="+a+"&apiKey=52c90e67f4164e4f8cadab7c05274ea8",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$of)
 case 3:q=m.pm(c.a)
 s=1
 break
@@ -55485,7 +55485,7 @@ while(true)switch(s){case 0:o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/sources",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$k7)
+return P.a2(p.a.hU(0,"/sources?apiKey=52c90e67f4164e4f8cadab7c05274ea8",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$k7)
 case 3:q=m.ak2(b.a)
 s=1
 break
@@ -55499,7 +55499,7 @@ o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/top-headlines?sources="+H.a(a),P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$ka)
+return P.a2(p.a.hU(0,"/top-headlines?sources="+H.a(a)+"&apiKey=52c90e67f4164e4f8cadab7c05274ea8",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$ka)
 case 3:q=m.pm(c.a)
 s=1
 break
@@ -55513,7 +55513,7 @@ o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/top-headlines?category="+a,P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$oc)
+return P.a2(p.a.hU(0,"/top-headlines?category="+a+"&apiKey=52c90e67f4164e4f8cadab7c05274ea8",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$oc)
 case 3:q=m.pm(c.a)
 s=1
 break
@@ -55528,7 +55528,7 @@ o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/top-headlines?country="+a+"&category="+b,P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$oe)
+return P.a2(p.a.hU(0,"/top-headlines?country="+a+"&category="+b+"&apiKey=52c90e67f4164e4f8cadab7c05274ea8",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$oe)
 case 3:q=m.pm(d.a)
 s=1
 break
@@ -55542,7 +55542,7 @@ o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/top-headlines?category="+a+"&pageSize=2",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$od)
+return P.a2(p.a.hU(0,"/top-headlines?category="+a+"&pageSize=2&apiKey=52c90e67f4164e4f8cadab7c05274ea8",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$od)
 case 3:q=m.pm(c.a)
 s=1
 break
@@ -55556,7 +55556,7 @@ o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/everything?q="+H.a(a),P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$oa)
+return P.a2(p.a.hU(0,"/everything?q="+H.a(a)+"&apiKey=52c90e67f4164e4f8cadab7c05274ea8",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$oa)
 case 3:q=m.pm(c.a)
 s=1
 break
