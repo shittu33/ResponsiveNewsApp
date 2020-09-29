@@ -19,7 +19,13 @@ Flutter is a great because of it cross platform hotReload solution, i just think
 
 ## Technologies
 **This project fetch its data from:**
-* [News API](https://newsapi.org)
+*https://abdulmujeeb-nodejs-news.herokuapp.com/
+**The above Api was built using the following**
+*Node.js
+*Express
+*body-parser
+*[News API](https://newsapi.org)
+*the source code for the Api server can be found  [here](https://newsapi.org)
 
 **I used following SDK:**
 * Flutter SDK
