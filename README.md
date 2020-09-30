@@ -18,8 +18,18 @@ Flutter is a great because of it cross platform hotReload solution, i just think
 
 
 ## Technologies
-**This project fetch its data from:**
+
+**This project fetch its data with this base url:**
+```
+@RestApi(baseUrl: "https://abdulmujeeb-nodejs-news.herokuapp.com/")
+```
+**The Api was built using the following:**
+
+* Node.js
+* Express
+* body-parser
 * [News API](https://newsapi.org)
+* the source code for the Api server can be found  [here](https://github.com/shittu33/HerokuNewsApiServer)
 
 **I used following SDK:**
 * Flutter SDK
@@ -44,6 +54,18 @@ Flutter is a great because of it cross platform hotReload solution, i just think
 * Filter News by Country
 * Filter News by Source(e.g bbc and abc News)
 * Filter News by Tag
+
+
+## Install && Run the App on your device
+
+### Run the App on your brower with this link:
+https://shittu33.github.io/ResponsiveNewsApp 
+
+### APK
+you can also download the raw APK by clicking
+[here](https://github.com/shittu33/ResponsiveNewsApp/blob/master/news.apk)
+
+
 
 ## Build your own News App
 
