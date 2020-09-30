@@ -55459,7 +55459,7 @@ while(true)switch(s){case 0:o=t.X
 n=t.z
 m=B
 s=3
-return P.a2(p.a.hU(0,"/top-headlines?category=general/*&apiKey=52c90e67f4164e4f8cadab7c05274ea8*/",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$e9)
+return P.a2(p.a.hU(0,"/top-headlines?category=general&apiKey=52c90e67f4164e4f8cadab7c05274ea8",P.v(o,n),B.kb(p.b,null,null,null,C.bj,null,P.v(o,n),null,"GET",null,null,null,null,null,null,null,null,null),P.v(o,n),t.B),$async$e9)
 case 3:q=m.pm(b.a)
 s=1
 break
