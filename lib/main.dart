@@ -49,8 +49,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   List<String> selectedSources;
   String selectedCountry;
   String selectedTag;
-  int selectedCategory=0;
+  int selectedCategory = 0;
   static const appBarHeight = 60.0;
+  static const appBarLogoHeight = appBarHeight - 5.0;
   static const appBarIconHeight = appBarHeight - 30.0;
   final appIconColor = Colors.cyan[900];
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -153,15 +154,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return isSmallerScreen(context) || isSmallScreen(context)
         ? AppBar(
             toolbarHeight: 110,
-            leading: buildWidgetOnCondition(
-                isSmallerScreen(context), buildLeadingChild(context),
-                altWidget: buildLeadingChild(context)),
+            leading: isSmallScreen(context)
+                ? buildLeadingChild(context)
+                : buildLeadingChild(context),
             centerTitle: false,
             leadingWidth: isSmallerScreen(context) || isSmallScreen(context)
-                ? appBarHeight + 5
+                ? appBarLogoHeight + 10
                 : 150,
             title: buildWidgetOnCondition(
-//                false,
                 isSmallerScreen(context) || isSmallScreen(context),
                 Padding(
                   padding: const EdgeInsets.only(right: 0.0),
@@ -202,33 +202,29 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         Icon(
           Icons.face,
           color: Colors.cyan,
-          size: appBarHeight,
+          size: appBarLogoHeight,
         ),
-        buildWidgetOnCondition(
-            !isSmaller,
-            SizedBox(
-              width: 3,
-            )),
-        buildWidgetOnCondition(
-          isMediumLarge(context),
+        if (!isSmaller)
+          SizedBox(
+            width: 3,
+          ),
+        if (isMediumLarge(context))
           RoundIcon(
               icon: Icons.search,
               onPress: () {
                 Scaffold.of(context).openDrawer();
-              }),
-          altWidget: isExtraLargeScreen(context)
-              ? RoundSearchBar(
-                  height: 43,
-                  width: 200,
-                  label: "search News",
-                  initialText: "search something",
-                  txtController: txtController,
-                  iconTap: toggleDrawer,
-                  onSubmitted: (searchedText) =>
-                      newsBloc.loadTaggedNews(searchedText),
-                )
-              : Container(),
-        ),
+              })
+        else if (isExtraLargeScreen(context))
+          RoundSearchBar(
+            height: 43,
+            width: 200,
+            label: "search News",
+            initialText: "search something",
+            txtController: txtController,
+            iconTap: toggleDrawer,
+            onSubmitted: (searchedText) =>
+                newsBloc.loadTaggedNews(searchedText),
+          )
       ],
     );
   }
@@ -236,22 +232,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   List<Widget> buildTrailingChild(BuildContext context) {
     var isSmaller = isSmallerScreen(context);
     return [
-      buildWidgetOnCondition(
-        !isSmaller,
+      if (!isSmaller)
         RoundIcon(
             icon: Icons.add,
             onPress: () {
               Scaffold.of(context).openDrawer();
             }),
-      ),
-      buildWidgetOnCondition(
-        !isSmaller,
+      if (!isSmaller)
         RoundIcon(
             icon: Icons.sync,
             onPress: () {
               Scaffold.of(context).openDrawer();
             }),
-      ),
       RoundIcon(
           icon: Icons.alarm,
           onPress: () {
@@ -274,13 +266,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         buildTabIconButton(MyFlutterApp.football_ball),
         buildTabIconButton(MyFlutterApp.movie_filter),
         buildTabIconButton(MyFlutterApp.health),
-        isRequireMenuBtn ? buildTabIconButton(Icons.menu) : null,
-      ]..remove(null),
-      onTap: (index, tabsList) {
-        isRequireMenuBtn && index == tabsList.length - 1
-            ? toggleDrawer()
-            : loadSelectCatNews(index);
-      },
+        if (isRequireMenuBtn) buildTabIconButton(Icons.menu),
+      ],
+      onTap: (index, tabsList) =>
+          isRequireMenuBtn && index == tabsList.length - 1
+              ? toggleDrawer()
+              : loadSelectCatNews(index),
     );
   }
 
@@ -420,7 +411,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     var smallHeight = 160.0;
     var image = newsData.urlToImage;
     return GestureDetector(
-      onTap: () => LoadDetailsScreen(context, newsData.url),
+      onTap: () => loadDetailsScreen(context, newsData.url),
       child: Container(
         height: isMediumLarge(context) ? largeHeight : smallHeight,
 //                      constraints: BoxConstraints.expand(width:120),
@@ -676,7 +667,7 @@ class NewsItem extends StatelessWidget {
 //            crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 buildFlatButton(() {}, Icons.share, "Share"),
-                buildFlatButton(() => LoadDetailsScreen(context, newsUrl),
+                buildFlatButton(() => loadDetailsScreen(context, newsUrl),
                     Icons.remove_red_eye, "Visit"),
                 buildFlatButton(() {}, Icons.bookmark_border, "Save"),
               ],
@@ -724,7 +715,7 @@ class NewsItem extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                LoadDetailsScreen(context, newsUrl);
+                loadDetailsScreen(context, newsUrl);
               },
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
@@ -763,7 +754,7 @@ class NewsItem extends StatelessWidget {
   }
 }
 
-Future LoadDetailsScreen(BuildContext context, String newsUrl) {
+Future loadDetailsScreen(BuildContext context, String newsUrl) {
   return Navigator.push(
       context,
       MaterialPageRoute(

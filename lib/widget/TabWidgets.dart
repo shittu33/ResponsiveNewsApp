@@ -125,7 +125,7 @@ class TabWidget extends StatelessWidget {
       child: TabBar(
 //        controller: DefaultTabController.of(context),
           onTap: (index) {
-            onTap(index,tabsList);
+            onTap(index, tabsList);
           },
           indicatorColor: selectedColor,
           unselectedLabelColor: unselectedColor,
@@ -152,6 +152,8 @@ class MyCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     const CenterGap = 10.0;
+    var isLeadExist = leading != null;
+    var isTailExist = trailing != null;
     return Material(
       elevation: 2,
       color: Colors.white,
@@ -160,21 +162,21 @@ class MyCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Flex(
           direction: Axis.horizontal,
           children: [
-            leading,
+            if (isLeadExist) leading,
             Expanded(
-              flex:13,
+              flex: isLeadExist ? 13 : 5,
               child: SizedBox(
                 width: CenterGap,
               ),
             ),
-            Expanded(flex:78,child: child),
+            Expanded(flex: 78, child: child),
             Expanded(
-              flex:13,
+              flex: isTailExist ? 13 : 5,
               child: SizedBox(
                 width: CenterGap,
               ),
             ),
-            trailing,
+            if (isTailExist) trailing,
           ]..removeWhere((element) => element == null),
         ),
       ),

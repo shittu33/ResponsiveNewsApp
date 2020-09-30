@@ -85,7 +85,7 @@ Map<String, dynamic> _$SourcesResultToJson(SourcesResult instance) =>
 class _NewsClient implements NewsClient {
   _NewsClient(this._dio, {this.baseUrl}) {
     ArgumentError.checkNotNull(_dio, '_dio');
-    this.baseUrl ??= 'https://newsapi.org/v2/';
+    this.baseUrl ??= 'https://abdulmujeeb-nodejs-news.herokuapp.com/';
   }
 
   final Dio _dio;

@@ -7,51 +7,66 @@ import 'config.dart';
 
 part 'news.g.dart';
 
-//@RestApi(baseUrl: "https://abdulmujeeb-nodejs-news.herokuapp.com/")
-@RestApi(baseUrl: "http://localhost:3000/")
+@RestApi(baseUrl: "https://abdulmujeeb-nodejs-news.herokuapp.com/")
+//@RestApi(baseUrl: "http://localhost:3000/")
 //@RestApi(baseUrl: "https://newsapi.org/v2/")
 abstract class NewsClient {
   factory NewsClient(Dio dio) = _NewsClient;
 
   @GET("/top-headlines?category=general&apiKey=$NEWS_API_KEY")
+//  @GET("/top-headlines?category=general")
   Future<NewsApiResult> getNews();
 
   @GET("/top-headlines?country={country}&apiKey=$NEWS_API_KEY")
+//  @GET("/top-headlines?country={country}")
   Future<NewsApiResult> getNewsByCountry(@Path("country") String countryId);
 
   @GET("/sources?apiKey=$NEWS_API_KEY") /*bbc-news*/
+//  @GET("/sources") /*bbc-news*/
   Future<SourcesResult> getNewsSources();
 
   @GET("/top-headlines?sources={sources}&apiKey=$NEWS_API_KEY") /*bbc-news*/
+//  @GET("/top-headlines?sources={sources}") /*bbc-news*/
   Future<NewsApiResult> getTopNewsBySources(@Path("sources") String sourceId);
 
   @GET("/top-headlines?category={category}&apiKey=$NEWS_API_KEY") /*business*/
+//  @GET("/top-headlines?category={category}") /*business*/
   Future<NewsApiResult> getNewsByCategory(@Path("category") String categoryId);
 
   @GET(
       "/top-headlines?country={country}&category={category}&apiKey=$NEWS_API_KEY")
+//  @GET(
+//      "/top-headlines?country={country}&category={category}")
   Future<NewsApiResult> getNewsByContCat(
       @Path("country") String countryId, @Path("category") String categoryId);
 
   @GET(
-      "/top-headlines?category={category}&pageSize=2&apiKey=$NEWS_API_KEY") /*business*/
+      "/top-headlines?category={category}&pageSize=2&apiKey=$NEWS_API_KEY")
+//  @GET(
+//      "/top-headlines?category={category}&pageSize=2") /*business*/
   Future<NewsApiResult> getNewsByCategoryLimit(
       @Path("category") String categoryId);
 
   @GET("/everything?q={q}&apiKey=$NEWS_API_KEY") /*bbc-news*/
+//  @GET("/everything?q={q}") /*bbc-news*/
   Future<NewsApiResult> getEveryNews(@Path("q") String searchedData);
 
   @GET("/everything?q={q}&sources={sources}&apiKey=$NEWS_API_KEY") /*bbc-news*/
+//  @GET("/everything?q={q}&sources={sources}") /*bbc-news*/
   Future<NewsApiResult> getEveryNewsBySources(
       @Path("q") String searchedData, @Path("sources") String sourceId);
 
   @GET(
       "/everything?q={q}&language={language}&apiKey=$NEWS_API_KEY") /*bbc-news*/
+//  @GET(
+//      "/everything?q={q}&language={language}") /*bbc-news*/
   Future<NewsApiResult> getEveryNewsByLang(
       @Path("q") String searchedData, @Path("language") String language);
 
   @GET(
       "/everything?q={q}&sources={sources}&language={language}&apiKey=$NEWS_API_KEY") /*bbc-news*/
+//  @GET(
+//      "/everything?q={q}&sources={sources}&language={language}") /*bbc-news*/
   Future<NewsApiResult> getNewsBySourceLang(@Path("q") String searchedData,
       @Path("language") String language, @Path("sources") String sourceId);
 }
